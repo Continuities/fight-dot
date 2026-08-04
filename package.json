@@ -1,5 +1,6 @@
 {
-	"name": "fight-dots",
+	"name": "fight-dot",
+	"description": "a dot for fighting",
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
