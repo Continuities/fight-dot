@@ -10,3 +10,7 @@ interface Theme {
 }
 
 type Player = 'p1' | 'p2';
+
+type KeyCode = string;
+
+type KeyBinds = Record<Player, KeyCode>;

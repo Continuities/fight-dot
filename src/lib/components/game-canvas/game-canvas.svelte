@@ -5,6 +5,7 @@
 
 	interface Props {
 		winner: Player | undefined;
+		keybinds: KeyBinds;
 	}
 
 	const SHOW_FPS = true;
@@ -16,7 +17,7 @@
 	const WIN_TIME = 300; // ms range of the edge to win
 	const WIN_RANGE = WIN_TIME / DOT_SPEED;
 
-	let { winner = $bindable() }: Props = $props();
+	let { winner = $bindable(), keybinds }: Props = $props();
 
 	let canvas: HTMLCanvasElement;
 	let fps = $state(0);
@@ -27,12 +28,19 @@
 	let ballPos = $state(1); // [-1, 1]
 	let inTarget = $state(false); // is the ball in the target window
 
-	const onclick = () => {
+	const resetGame = () => {
+		border = 0;
+		ballPos = -1;
+		playerTurn = 'p1';
+		winner = undefined;
+	};
+
+	const onkeydown = (e: KeyboardEvent) => {
 		if (winner) {
-			border = 0;
-			ballPos = -1;
-			playerTurn = 'p1';
-			winner = undefined;
+			resetGame();
+			return;
+		}
+		if (e.code !== keybinds[playerTurn]) {
 			return;
 		}
 		if (inTarget) {
@@ -44,6 +52,12 @@
 			}
 		}
 		ballPos = playerTurn === 'p1' ? -1 : 1;
+	};
+
+	const onclick = () => {
+		if (winner) {
+			resetGame();
+		}
 	};
 
 	onMount(() => {
@@ -131,7 +145,7 @@
 	});
 </script>
 
-<svelte:window bind:innerHeight={windowHeight} bind:innerWidth={windowWidth} />
+<svelte:window bind:innerHeight={windowHeight} bind:innerWidth={windowWidth} {onkeydown} />
 
 {#if SHOW_FPS}
 	<div class="absolute top-0 left-0 m-2 text-white">

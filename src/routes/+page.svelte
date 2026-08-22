@@ -4,7 +4,13 @@
 	let winner: Player | undefined = $state();
 </script>
 
-<GameCanvas bind:winner />
+<GameCanvas
+	bind:winner
+	keybinds={{
+		p1: 'ShiftLeft',
+		p2: 'ShiftRight'
+	}}
+/>
 {#if winner}
 	<WinnerOverlay {winner} />
 {/if}
