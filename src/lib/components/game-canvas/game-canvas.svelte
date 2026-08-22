@@ -1,20 +1,22 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { currentTheme } from '$lib/theme.svelte';
+	import { lerp, lerpColour } from '$lib/lerp';
+
+	interface Props {
+		winner: Player | undefined;
+	}
 
 	const SHOW_FPS = true;
-	const THEME: Theme = {
-		bg: { rgb: [0, 18, 25] },
-		fg: { rgb: [233, 216, 166] },
-		p1: { rgb: [0, 95, 115] },
-		p2: { rgb: [155, 34, 38] }
-	};
-	const DOT_SIZE = 0.005; // [0, 1] % of screen width
+	const DOT_SIZE = 0.006; // [0, 1] % of screen width
 	const TRACK_THICKNESS = 0.003; // [0, 1] % of screen width
 	const GUTTER_SIZE = 0.01; // [0, 1] % of screen width
 	const DOT_SPEED = 2000; // ms to cross the screen
 	const PROGRESS_WINDOW = 0.2; // [0, 1] % of track width
 	const WIN_TIME = 300; // ms range of the edge to win
 	const WIN_RANGE = WIN_TIME / DOT_SPEED;
+
+	let { winner = $bindable() }: Props = $props();
 
 	let canvas: HTMLCanvasElement;
 	let fps = $state(0);
@@ -24,7 +26,6 @@
 	let border = $state(0); // [-1, 1]
 	let ballPos = $state(1); // [-1, 1]
 	let inTarget = $state(false); // is the ball in the target window
-	let winner = $state<Player>();
 
 	const onclick = () => {
 		if (winner) {
@@ -76,13 +77,14 @@
 				}
 
 				if (ctx) {
-					ctx.fillStyle = `rgb(${THEME.bg.rgb.join(',')})`;
+					const blamAmount = !inTarget ? 0 : Math.abs(ballPos - border) / PROGRESS_WINDOW;
+					ctx.fillStyle = `rgb(${lerpColour(currentTheme.bg, currentTheme.fg, blamAmount).rgb.join(',')})`;
 					ctx.fillRect(0, 0, canvas.width, canvas.height);
-					ctx.fillStyle = `rgb(${THEME.fg.rgb.join(',')})`;
+					ctx.fillStyle = `rgb(${currentTheme.fg.rgb.join(',')})`;
 					ctx.lineWidth = TRACK_THICKNESS * canvas.width;
 
 					// Draw p1 territory
-					ctx.fillStyle = `rgb(${THEME.p1.rgb.join(',')})`;
+					ctx.fillStyle = `rgb(${currentTheme.p1.rgb.join(',')})`;
 					ctx.beginPath();
 					ctx.roundRect(
 						gutterLength,
@@ -94,7 +96,7 @@
 					ctx.fill();
 
 					// Draw p2 territory
-					ctx.fillStyle = `rgb(${THEME.p2.rgb.join(',')})`;
+					ctx.fillStyle = `rgb(${currentTheme.p2.rgb.join(',')})`;
 					ctx.beginPath();
 					ctx.roundRect(
 						gutterLength + trackLength / 2 + (trackLength / 2) * border,
@@ -110,16 +112,16 @@
 					ctx.arc(
 						canvas.width / 2 + ballPos * (canvas.width / 2 - DOT_SIZE * canvas.width),
 						canvas.height / 2,
-						DOT_SIZE * canvas.width * (inTarget ? 2 : 1),
+						DOT_SIZE * canvas.width * lerp(1, 3, blamAmount),
 						0,
 						Math.PI * 2
 					);
-					// ctx.strokeStyle = `rgb(${THEME.fg.rgb.join(',')})`;
+					// ctx.strokeStyle = `rgb(${currentTheme.fg.rgb.join(',')})`;
 					// ctx.stroke();
 					if (playerTurn === 'p1') {
-						ctx.fillStyle = `rgb(${THEME.p1.rgb.join(',')})`;
+						ctx.fillStyle = `rgb(${currentTheme.p1.rgb.join(',')})`;
 					} else {
-						ctx.fillStyle = `rgb(${THEME.p2.rgb.join(',')})`;
+						ctx.fillStyle = `rgb(${currentTheme.p2.rgb.join(',')})`;
 					}
 					ctx.fill();
 				}
