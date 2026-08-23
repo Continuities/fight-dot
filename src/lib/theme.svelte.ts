@@ -1,16 +1,7 @@
+import { DEFAULT_THEME } from './config';
+
 // eslint-disable-next-line prefer-const
-export let currentTheme = $state<Theme>({
-	bg: { rgb: [0, 18, 25] },
-	fg: { rgb: [233, 216, 166] },
-	p1: {
-		default: { rgb: [0, 95, 115] },
-		light: { rgb: [10, 147, 150] }
-	},
-	p2: {
-		default: { rgb: [174, 32, 18] },
-		light: { rgb: [186, 62, 3] }
-	}
-});
+export let currentTheme = $state<Theme>(DEFAULT_THEME);
 type ThemeEntries = {
 	[K in keyof Theme]: [K, Theme[K]];
 }[keyof Theme];

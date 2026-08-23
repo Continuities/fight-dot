@@ -5,9 +5,10 @@
 	interface Props {
 		keybinds: KeyBinds;
 		playerTurn: Player;
+		paused?: boolean;
 	}
 
-	let { keybinds, playerTurn }: Props = $props();
+	let { keybinds, playerTurn, paused }: Props = $props();
 
 	let p1down = $state(false);
 	let p2down = $state(false);
@@ -15,6 +16,9 @@
 	const keyButton = 'absolute top-1/2 -translate-y-1/2';
 
 	const onkeydown = (e: KeyboardEvent) => {
+		if (paused) {
+			return;
+		}
 		if (e.code === keybinds.p1) {
 			p1down = true;
 		} else if (e.code === keybinds.p2) {

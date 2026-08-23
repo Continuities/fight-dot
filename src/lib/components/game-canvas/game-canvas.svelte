@@ -2,6 +2,15 @@
 	import { onMount } from 'svelte';
 	import { currentTheme } from '$lib/theme.svelte';
 	import { lerp, lerpColour } from '$lib/lerp';
+	import {
+		WIN_RANGE,
+		GUTTER_SIZE,
+		PROGRESS_WINDOW,
+		DOT_SPEED,
+		TRACK_THICKNESS,
+		DOT_SIZE,
+		SHOW_FPS
+	} from '$lib/config';
 
 	interface Props {
 		winner: Player | undefined;
@@ -11,15 +20,6 @@
 		onGameWon?: (winner: Player) => void;
 		onHit?: (hitter: Player) => void;
 	}
-
-	const SHOW_FPS = true;
-	const DOT_SIZE = 0.006; // [0, 1] % of screen width
-	const TRACK_THICKNESS = 0.003; // [0, 1] % of screen width
-	const GUTTER_SIZE = 0.08; // [0, 1] % of screen width
-	const DOT_SPEED = 2000; // ms to cross the screen
-	const PROGRESS_WINDOW = 0.2; // [0, 1] % of track width
-	const WIN_TIME = 300; // ms range of the edge to win
-	const WIN_RANGE = WIN_TIME / DOT_SPEED;
 
 	let {
 		winner = $bindable(),
