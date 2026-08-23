@@ -9,10 +9,11 @@
 	};
 
 	let winner: Player | undefined = $state();
+	let playerTurn: Player = $state('p1');
 </script>
 
-<GameCanvas bind:winner keybinds={KEYBINDS} />
-<PlayerButtonsOverlay keybinds={KEYBINDS} />
+<GameCanvas bind:playerTurn bind:winner keybinds={KEYBINDS} />
+<PlayerButtonsOverlay keybinds={KEYBINDS} {playerTurn} />
 {#if winner}
 	<WinnerOverlay {winner} />
 {/if}

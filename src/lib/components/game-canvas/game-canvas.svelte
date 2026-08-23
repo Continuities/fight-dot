@@ -5,6 +5,7 @@
 
 	interface Props {
 		winner: Player | undefined;
+		playerTurn: Player;
 		keybinds: KeyBinds;
 		paused?: boolean;
 	}
@@ -18,13 +19,12 @@
 	const WIN_TIME = 300; // ms range of the edge to win
 	const WIN_RANGE = WIN_TIME / DOT_SPEED;
 
-	let { winner = $bindable(), keybinds, paused }: Props = $props();
+	let { winner = $bindable(), playerTurn = $bindable('p1'), keybinds, paused }: Props = $props();
 
 	let canvas: HTMLCanvasElement;
 	let fps = $state(0);
 	let windowHeight = $state(0);
 	let windowWidth = $state(0);
-	let playerTurn = $state<Player>('p1');
 	let border = $state(0); // [-1, 1]
 	let ballPos = $state(1); // [-1, 1]
 	let inTarget = $state(false); // is the ball in the target window

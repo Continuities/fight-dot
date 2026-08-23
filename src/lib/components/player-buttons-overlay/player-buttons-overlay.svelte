@@ -1,9 +1,10 @@
 <script lang="ts">
 	interface Props {
 		keybinds: KeyBinds;
+		playerTurn: Player;
 	}
 
-	let { keybinds }: Props = $props();
+	let { keybinds, playerTurn }: Props = $props();
 
 	let p1down = $state(false);
 	let p2down = $state(false);
@@ -31,9 +32,9 @@
 
 <button
 	style={`--dark:var(--p1);--light:var(--p1${p1down ? '' : '-light'});`}
-	class={`${keyButton} left-4`}>{keybinds.p1}</button
+	class={`${keyButton} ${playerTurn !== 'p1' ? 'opacity-50' : ''} left-4`}>{keybinds.p1}</button
 >
 <button
 	style={`--dark:var(--p2);--light:var(--p2${p2down ? '' : '-light'});`}
-	class={`${keyButton} right-4`}>{keybinds.p2}</button
+	class={`${keyButton} ${playerTurn !== 'p2' ? 'opacity-50' : ''} right-4`}>{keybinds.p2}</button
 >
