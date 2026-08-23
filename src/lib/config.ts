@@ -13,7 +13,7 @@ export const DEFAULT_KEYBINDS: KeyBinds = {
 	next: 'Space'
 };
 export const DEFAULT_THEME: Theme = {
-	bg: { rgb: [0, 18, 25] },
+	bg: { rgb: [17, 17, 17] },
 	fg: { rgb: [233, 216, 166] },
 	p1: {
 		default: { rgb: [0, 95, 115] },
