@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages';
 	import { currentTheme } from '$lib/theme.svelte';
+	import { fade } from 'svelte/transition';
 	import KeyButton from '../key-button/key-button.svelte';
 
 	interface Props {
@@ -13,6 +14,7 @@
 <svelte:window {onkeydown} />
 
 <div
+	transition:fade={{ duration: 100 }}
 	class="absolute top-0 flex h-full w-full items-center justify-center text-8xl font-thin tracking-widest text-(--fg) backdrop-blur-2xl"
 >
 	{m.title()}

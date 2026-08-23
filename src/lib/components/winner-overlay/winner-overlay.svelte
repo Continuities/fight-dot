@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages';
 	import { currentTheme } from '$lib/theme.svelte';
+	import { fade } from 'svelte/transition';
 	import KeyButton from '../key-button/key-button.svelte';
 	interface Props {
 		winner: Player;
@@ -11,6 +12,7 @@
 </script>
 
 <div
+	transition:fade={{ duration: 100 }}
 	class="pointer-events-none absolute top-0 left-0 flex h-full w-full flex-col items-center justify-center text-9xl leading-none font-thin tracking-widest text-(--winner) backdrop-blur"
 	style={`--winner:var(--${winner})`}
 >
