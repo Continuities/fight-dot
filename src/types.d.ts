@@ -5,8 +5,14 @@ interface Colour {
 interface Theme {
 	bg: Colour;
 	fg: Colour;
-	p1: Colour;
-	p2: Colour;
+	p1: {
+		default: Colour;
+		light: Colour;
+	};
+	p2: {
+		default: Colour;
+		light: Colour;
+	};
 }
 
 type Player = 'p1' | 'p2';
