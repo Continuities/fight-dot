@@ -2,6 +2,7 @@
 	import { GameCanvas } from '$lib/components/game-canvas';
 	import { PlayerButtonsOverlay } from '$lib/components/player-buttons-overlay';
 	import ScoreOverlay from '$lib/components/score-overlay/score-overlay.svelte';
+	import TitleOverlay from '$lib/components/title-overlay/title-overlay.svelte';
 	import WinnerOverlay from '$lib/components/winner-overlay/winner-overlay.svelte';
 
 	const HIT_ANIMATION_DURATION = 200; // ms
@@ -11,6 +12,7 @@
 		next: 'Space'
 	};
 
+	let showingTitle = $state(true);
 	let winner: Player | undefined = $state();
 	let playerTurn: Player = $state('p1');
 	let score: Score = $state({
@@ -34,17 +36,35 @@
 			lastHit = undefined;
 		}, HIT_ANIMATION_DURATION);
 	};
+
+	const onkeydown = (e: KeyboardEvent) => {
+		if (showingTitle && e.code === KEYBINDS.next) {
+			showingTitle = false;
+		}
+	};
 </script>
+
+<svelte:window {onkeydown} />
 
 <div class="overflow-hidden bg-(--bg)">
 	<div class={hitClass} style={`--duration:${HIT_ANIMATION_DURATION}ms`}>
-		<GameCanvas bind:playerTurn bind:winner keybinds={KEYBINDS} {onGameWon} {onHit} />
+		<GameCanvas
+			bind:playerTurn
+			bind:winner
+			keybinds={KEYBINDS}
+			{onGameWon}
+			{onHit}
+			paused={showingTitle}
+		/>
 		<PlayerButtonsOverlay keybinds={KEYBINDS} {playerTurn} />
 		{#if winner}
-			<WinnerOverlay {winner} />
+			<WinnerOverlay {winner} keybinds={KEYBINDS} />
 		{/if}
 		{#if score.p1 > 0 || score.p2 > 0}
 			<ScoreOverlay {score} />
+		{/if}
+		{#if showingTitle}
+			<TitleOverlay keybinds={KEYBINDS} />
 		{/if}
 	</div>
 </div>

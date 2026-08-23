@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { currentTheme } from '$lib/theme.svelte';
+	import KeyButton from '../key-button/key-button.svelte';
+
 	interface Props {
 		keybinds: KeyBinds;
 		playerTurn: Player;
@@ -9,8 +12,7 @@
 	let p1down = $state(false);
 	let p2down = $state(false);
 
-	const keyButton =
-		'absolute top-1/2 text-sm w-25 bg-(--light) text-(--fg) font-bold py-2 px-4 border-b-4 border-(--dark) rounded -translate-y-1/2';
+	const keyButton = 'absolute top-1/2 -translate-y-1/2';
 
 	const onkeydown = (e: KeyboardEvent) => {
 		if (e.code === keybinds.p1) {
@@ -30,11 +32,22 @@
 
 <svelte:window {onkeydown} {onkeyup} />
 
-<button
-	style={`--dark:var(--p1);--light:var(--p1${p1down ? '' : '-light'});`}
-	class={`${keyButton} ${playerTurn !== 'p1' ? 'opacity-50' : ''} left-4`}>{keybinds.p1}</button
->
-<button
-	style={`--dark:var(--p2);--light:var(--p2${p2down ? '' : '-light'});`}
-	class={`${keyButton} ${playerTurn !== 'p2' ? 'opacity-50' : ''} right-4`}>{keybinds.p2}</button
->
+<div class={`${keyButton} left-4`}>
+	<KeyButton
+		code={keybinds.p1}
+		fg={currentTheme.p1.light}
+		bg={currentTheme.p1.default}
+		pressed={p1down}
+		active={playerTurn === 'p1'}
+	/>
+</div>
+
+<div class={`${keyButton} right-4`}>
+	<KeyButton
+		code={keybinds.p2}
+		fg={currentTheme.p2.light}
+		bg={currentTheme.p2.default}
+		pressed={p2down}
+		active={playerTurn === 'p2'}
+	/>
+</div>

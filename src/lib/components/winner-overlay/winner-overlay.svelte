@@ -1,10 +1,13 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages';
+	import { currentTheme } from '$lib/theme.svelte';
+	import KeyButton from '../key-button/key-button.svelte';
 	interface Props {
 		winner: Player;
+		keybinds: KeyBinds;
 	}
 
-	let { winner }: Props = $props();
+	let { winner, keybinds }: Props = $props();
 </script>
 
 <div
@@ -12,4 +15,12 @@
 	style={`--winner:var(--${winner})`}
 >
 	{m.winner({ name: winner.toUpperCase() })}
+	<div class="absolute bottom-1/4">
+		<KeyButton
+			code={keybinds.next}
+			active
+			fg={currentTheme[winner].light}
+			bg={currentTheme[winner].default}
+		/>
+	</div>
 </div>
