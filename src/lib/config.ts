@@ -2,10 +2,11 @@ export const SHOW_FPS = false;
 export const DOT_SIZE = 0.006; // [0, 1] % of screen width
 export const TRACK_THICKNESS = 0.003; // [0, 1] % of screen width
 export const GUTTER_SIZE = 0.08; // [0, 1] % of screen width
-export const DOT_SPEED = 2000; // ms to cross the screen
+export const STARTING_DOT_SPEED = 3000; // ms to cross the screen
+export const DOT_MAX_SPEED = 1000; // ms to cross the screen
+export const SPEEDUP_ON_HIT = 100; // ms of speed gained per hit
 export const PROGRESS_WINDOW = 0.2; // [0, 1] % of track width
 export const WIN_TIME = 300; // ms range of the edge to win
-export const WIN_RANGE = WIN_TIME / DOT_SPEED;
 export const EFFECT_ANIMATION_DURATION = 200; // ms
 export const DEFAULT_KEYBINDS: KeyBinds = {
 	p1: 'ShiftLeft',

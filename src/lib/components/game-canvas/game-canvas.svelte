@@ -3,13 +3,15 @@
 	import { currentTheme } from '$lib/theme.svelte';
 	import { lerp, lerpColour } from '$lib/lerp';
 	import {
-		WIN_RANGE,
 		GUTTER_SIZE,
 		PROGRESS_WINDOW,
-		DOT_SPEED,
+		STARTING_DOT_SPEED,
+		SPEEDUP_ON_HIT,
 		TRACK_THICKNESS,
 		DOT_SIZE,
-		SHOW_FPS
+		SHOW_FPS,
+		WIN_TIME,
+		DOT_MAX_SPEED
 	} from '$lib/config';
 
 	interface Props {
@@ -37,7 +39,7 @@
 	let windowHeight = $state(0);
 	let windowWidth = $state(0);
 	let border = $state(0); // [-1, 1]
-	let ballPos = $state(1); // [-1, 1]
+	let dotPos = $state(1); // [-1, 1]
 	let inTarget = $state(false); // is the ball in the target window
 
 	let isActive = $derived(!winner && !paused);
@@ -45,9 +47,12 @@
 		lerpColour(currentTheme.p2.dark, currentTheme.p1.dark, (border + 1) / 2)
 	);
 
+	let dotSpeed = $state(STARTING_DOT_SPEED);
+	let winRange = $derived(WIN_TIME / dotSpeed);
+
 	const resetGame = () => {
 		border = 0;
-		ballPos = -1;
+		dotPos = -1;
 		playerTurn = 'p1';
 		winner = undefined;
 	};
@@ -73,14 +78,15 @@
 			if (onHit) {
 				onHit(playerTurn);
 			}
-			border = ballPos;
-			if (border <= WIN_RANGE - 1) {
+			border = dotPos;
+			dotSpeed = Math.max(dotSpeed - SPEEDUP_ON_HIT, DOT_MAX_SPEED);
+			if (border <= winRange - 1) {
 				triggerWin('p2');
-			} else if (border >= 1 - WIN_RANGE) {
+			} else if (border >= 1 - winRange) {
 				triggerWin('p1');
 			}
 		}
-		ballPos = playerTurn === 'p1' ? -1 : 1;
+		dotPos = playerTurn === 'p1' ? -1 : 1;
 	};
 
 	const onclick = () => {
@@ -107,15 +113,15 @@
 			const trackLength = canvas.width - gutterLength * 2;
 			const dir = playerTurn === 'p1' ? -1 : 1;
 			const target = border - dir * PROGRESS_WINDOW;
-			ballPos += (dir * delta * 2) / DOT_SPEED;
+			dotPos += (dir * delta * 2) / dotSpeed;
 			const wasInTarget = inTarget;
 			inTarget =
-				dir < 0 ? ballPos <= target && ballPos > border : ballPos >= target && ballPos < border;
-			if (ballPos > 1) {
-				ballPos = 1;
+				dir < 0 ? dotPos <= target && dotPos > border : dotPos >= target && dotPos < border;
+			if (dotPos > 1) {
+				dotPos = 1;
 				playerTurn = 'p1';
-			} else if (ballPos < -1) {
-				ballPos = -1;
+			} else if (dotPos < -1) {
+				dotPos = -1;
 				playerTurn = 'p2';
 			}
 			if (!wasInTarget && inTarget && onTarget) {
@@ -123,7 +129,7 @@
 			}
 
 			if (ctx) {
-				const blamAmount = !inTarget ? 0 : Math.abs(ballPos - border) / PROGRESS_WINDOW;
+				const blamAmount = !inTarget ? 0 : Math.abs(dotPos - border) / PROGRESS_WINDOW;
 				ctx.fillStyle = `rgb(${background.rgb.join(',')})`;
 				ctx.fillRect(0, 0, canvas.width, canvas.height);
 				ctx.fillStyle = `rgb(${currentTheme.fg.rgb.join(',')})`;
@@ -156,7 +162,7 @@
 				// Draw the ball
 				ctx.beginPath();
 				ctx.arc(
-					gutterLength + trackLength / 2 + ballPos * (trackLength / 2 - DOT_SIZE * trackLength),
+					gutterLength + trackLength / 2 + dotPos * (trackLength / 2 - DOT_SIZE * trackLength),
 					canvas.height / 2,
 					DOT_SIZE * canvas.width * lerp(1, 3, blamAmount),
 					0,
