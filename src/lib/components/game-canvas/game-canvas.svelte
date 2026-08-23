@@ -19,6 +19,7 @@
 		paused?: boolean;
 		onGameWon?: (winner: Player) => void;
 		onHit?: (hitter: Player) => void;
+		onTarget?: () => void;
 	}
 
 	let {
@@ -27,7 +28,8 @@
 		keybinds,
 		paused,
 		onGameWon,
-		onHit
+		onHit,
+		onTarget
 	}: Props = $props();
 
 	let canvas: HTMLCanvasElement;
@@ -39,6 +41,9 @@
 	let inTarget = $state(false); // is the ball in the target window
 
 	let isActive = $derived(!winner && !paused);
+	let background = $derived(
+		lerpColour(currentTheme.p2.dark, currentTheme.p1.dark, (border + 1) / 2)
+	);
 
 	const resetGame = () => {
 		border = 0;
@@ -103,6 +108,7 @@
 			const dir = playerTurn === 'p1' ? -1 : 1;
 			const target = border - dir * PROGRESS_WINDOW;
 			ballPos += (dir * delta * 2) / DOT_SPEED;
+			const wasInTarget = inTarget;
 			inTarget =
 				dir < 0 ? ballPos <= target && ballPos > border : ballPos >= target && ballPos < border;
 			if (ballPos > 1) {
@@ -112,10 +118,13 @@
 				ballPos = -1;
 				playerTurn = 'p2';
 			}
+			if (!wasInTarget && inTarget && onTarget) {
+				onTarget();
+			}
 
 			if (ctx) {
 				const blamAmount = !inTarget ? 0 : Math.abs(ballPos - border) / PROGRESS_WINDOW;
-				ctx.fillStyle = `rgb(${lerpColour(currentTheme.bg, currentTheme.fg, blamAmount).rgb.join(',')})`;
+				ctx.fillStyle = `rgb(${background.rgb.join(',')})`;
 				ctx.fillRect(0, 0, canvas.width, canvas.height);
 				ctx.fillStyle = `rgb(${currentTheme.fg.rgb.join(',')})`;
 				ctx.lineWidth = TRACK_THICKNESS * canvas.width;

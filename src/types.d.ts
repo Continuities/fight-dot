@@ -8,10 +8,12 @@ interface Theme {
 	p1: {
 		default: Colour;
 		light: Colour;
+		dark: Colour;
 	};
 	p2: {
 		default: Colour;
 		light: Colour;
+		dark: Colour;
 	};
 }
 
@@ -23,3 +25,5 @@ type KeyBinds = Record<Player, KeyCode> & {
 	next: KeyCode;
 };
 type Score = Record<Player, number>;
+
+type Effect = 'p1-hit' | 'p2-hit' | 'pulse';

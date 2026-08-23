@@ -15,7 +15,7 @@ export function themeToVars(theme: Theme): string {
 					return `--${k}:rgb(${v.rgb.join(',')});`;
 				case 'p1':
 				case 'p2':
-					return `--${k}:rgb(${v.default.rgb.join(',')});--${k}-light:rgb(${v.light.rgb.join(',')});`;
+					return `--${k}:rgb(${v.default.rgb.join(',')});--${k}-light:rgb(${v.light.rgb.join(',')});--${k}-dark:rgb(${v.dark.rgb.join(',')});`;
 			}
 		})
 		.join('');

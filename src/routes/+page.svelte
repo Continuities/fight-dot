@@ -4,7 +4,7 @@
 	import ScoreOverlay from '$lib/components/score-overlay/score-overlay.svelte';
 	import TitleOverlay from '$lib/components/title-overlay/title-overlay.svelte';
 	import WinnerOverlay from '$lib/components/winner-overlay/winner-overlay.svelte';
-	import { HIT_ANIMATION_DURATION, DEFAULT_KEYBINDS } from '$lib/config';
+	import { EFFECT_ANIMATION_DURATION, DEFAULT_KEYBINDS } from '$lib/config';
 
 	const keybinds = DEFAULT_KEYBINDS;
 
@@ -15,22 +15,27 @@
 		p1: 0,
 		p2: 0
 	});
-	let lastHit: Player | undefined = $state();
-	let hitClass = $derived(
-		lastHit === 'p1' ? 'kapow-p1' : lastHit === 'p2' ? 'kapow-p2' : undefined
-	);
+	let currentEffect: Effect | undefined = $state();
 
 	const onGameWon = (player: Player) => {
 		score[player]++;
 	};
 
-	let hitTimeout: NodeJS.Timeout;
+	let effectTimeout: NodeJS.Timeout;
+	const triggerEffect = (effect: Effect) => {
+		clearTimeout(effectTimeout);
+		currentEffect = effect;
+		effectTimeout = setTimeout(() => {
+			currentEffect = undefined;
+		}, EFFECT_ANIMATION_DURATION);
+	};
+
 	const onHit = (player: Player) => {
-		clearTimeout(hitTimeout);
-		lastHit = player;
-		hitTimeout = setTimeout(() => {
-			lastHit = undefined;
-		}, HIT_ANIMATION_DURATION);
+		triggerEffect(`${player}-hit`);
+	};
+
+	const onTarget = () => {
+		triggerEffect('pulse');
 	};
 
 	const onkeydown = (e: KeyboardEvent) => {
@@ -43,8 +48,16 @@
 <svelte:window {onkeydown} />
 
 <div class="overflow-hidden bg-(--bg)">
-	<div class={hitClass} style={`--duration:${HIT_ANIMATION_DURATION}ms`}>
-		<GameCanvas bind:playerTurn bind:winner {keybinds} {onGameWon} {onHit} paused={showingTitle} />
+	<div class={currentEffect} style={`--duration:${EFFECT_ANIMATION_DURATION}ms`}>
+		<GameCanvas
+			bind:playerTurn
+			bind:winner
+			{keybinds}
+			{onGameWon}
+			{onHit}
+			{onTarget}
+			paused={showingTitle}
+		/>
 		<PlayerButtonsOverlay {keybinds} {playerTurn} paused={showingTitle} />
 		{#if winner}
 			<WinnerOverlay {winner} {keybinds} />
@@ -63,6 +76,10 @@
 		0%,
 		100% {
 			transform: rotate(0);
+			filter: contrast(1);
+		}
+		0% {
+			filter: contrast(0.1);
 		}
 		10% {
 			transform: rotate(-1deg) scale(0.95);
@@ -76,6 +93,10 @@
 		0%,
 		100% {
 			transform: rotate(0);
+			filter: contrast(1);
+		}
+		0% {
+			filter: contrast(0.1);
 		}
 		10% {
 			transform: rotate(1deg) scale(0.95);
@@ -85,10 +106,27 @@
 		}
 	}
 
-	.kapow-p1 {
+	@keyframes pulse {
+		0%,
+		100% {
+			transform: scale(1);
+			filter: contrast(1);
+		}
+		0% {
+			filter: contrast(0.9);
+		}
+		50% {
+			transform: scale(1.01);
+		}
+	}
+
+	.p1-hit {
 		animation: kapow-clockwise var(--duration) ease-out;
 	}
-	.kapow-p2 {
+	.p2-hit {
 		animation: kapow-anticlockwise var(--duration) ease-out;
+	}
+	.pulse {
+		animation: pulse var(--duration) ease-out;
 	}
 </style>

@@ -6,7 +6,7 @@ export const DOT_SPEED = 2000; // ms to cross the screen
 export const PROGRESS_WINDOW = 0.2; // [0, 1] % of track width
 export const WIN_TIME = 300; // ms range of the edge to win
 export const WIN_RANGE = WIN_TIME / DOT_SPEED;
-export const HIT_ANIMATION_DURATION = 200; // ms
+export const EFFECT_ANIMATION_DURATION = 200; // ms
 export const DEFAULT_KEYBINDS: KeyBinds = {
 	p1: 'ShiftLeft',
 	p2: 'ShiftRight',
@@ -17,10 +17,12 @@ export const DEFAULT_THEME: Theme = {
 	fg: { rgb: [233, 216, 166] },
 	p1: {
 		default: { rgb: [0, 95, 115] },
-		light: { rgb: [10, 147, 150] }
+		light: { rgb: [10, 147, 150] },
+		dark: { rgb: [0, 10, 12] }
 	},
 	p2: {
 		default: { rgb: [174, 32, 18] },
-		light: { rgb: [186, 62, 3] }
+		light: { rgb: [186, 62, 3] },
+		dark: { rgb: [17, 3, 2] }
 	}
 };
