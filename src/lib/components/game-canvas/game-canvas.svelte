@@ -8,6 +8,7 @@
 		playerTurn: Player;
 		keybinds: KeyBinds;
 		paused?: boolean;
+		onGameWon?: (winner: Player) => void;
 	}
 
 	const SHOW_FPS = true;
@@ -19,7 +20,13 @@
 	const WIN_TIME = 300; // ms range of the edge to win
 	const WIN_RANGE = WIN_TIME / DOT_SPEED;
 
-	let { winner = $bindable(), playerTurn = $bindable('p1'), keybinds, paused }: Props = $props();
+	let {
+		winner = $bindable(),
+		playerTurn = $bindable('p1'),
+		keybinds,
+		paused,
+		onGameWon
+	}: Props = $props();
 
 	let canvas: HTMLCanvasElement;
 	let fps = $state(0);
@@ -38,6 +45,13 @@
 		winner = undefined;
 	};
 
+	const triggerWin = (forPlayer: Player) => {
+		winner = forPlayer;
+		if (onGameWon) {
+			onGameWon(forPlayer);
+		}
+	};
+
 	const onkeydown = (e: KeyboardEvent) => {
 		if (winner) {
 			resetGame();
@@ -49,9 +63,9 @@
 		if (inTarget) {
 			border = ballPos;
 			if (border <= WIN_RANGE - 1) {
-				winner = 'p2';
+				triggerWin('p2');
 			} else if (border >= 1 - WIN_RANGE) {
-				winner = 'p1';
+				triggerWin('p1');
 			}
 		}
 		ballPos = playerTurn === 'p1' ? -1 : 1;

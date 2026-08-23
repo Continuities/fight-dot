@@ -20,3 +20,4 @@ type Player = 'p1' | 'p2';
 type KeyCode = string;
 
 type KeyBinds = Record<Player, KeyCode>;
+type Score = Record<Player, number>;
