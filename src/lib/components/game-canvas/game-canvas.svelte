@@ -9,6 +9,7 @@
 		keybinds: KeyBinds;
 		paused?: boolean;
 		onGameWon?: (winner: Player) => void;
+		onHit?: (hitter: Player) => void;
 	}
 
 	const SHOW_FPS = true;
@@ -25,7 +26,8 @@
 		playerTurn = $bindable('p1'),
 		keybinds,
 		paused,
-		onGameWon
+		onGameWon,
+		onHit
 	}: Props = $props();
 
 	let canvas: HTMLCanvasElement;
@@ -54,13 +56,18 @@
 
 	const onkeydown = (e: KeyboardEvent) => {
 		if (winner) {
-			resetGame();
+			if (e.code === keybinds.next) {
+				resetGame();
+			}
 			return;
 		}
 		if (!isActive || e.code !== keybinds[playerTurn]) {
 			return;
 		}
 		if (inTarget) {
+			if (onHit) {
+				onHit(playerTurn);
+			}
 			border = ballPos;
 			if (border <= WIN_RANGE - 1) {
 				triggerWin('p2');

@@ -19,5 +19,7 @@ type Player = 'p1' | 'p2';
 
 type KeyCode = string;
 
-type KeyBinds = Record<Player, KeyCode>;
+type KeyBinds = Record<Player, KeyCode> & {
+	next: KeyCode;
+};
 type Score = Record<Player, number>;
