@@ -7,9 +7,10 @@
 		playerTurn: Player;
 		paused?: boolean;
 		winner?: Player;
+		onSwing?: (player: Player) => void;
 	}
 
-	let { keybinds, playerTurn, paused, winner }: Props = $props();
+	let { keybinds, playerTurn, paused, winner, onSwing }: Props = $props();
 
 	let p1down = $state(false);
 	let p2down = $state(false);
@@ -44,6 +45,7 @@
 		bg={currentTheme[winner ?? 'p1'].default}
 		pressed={p1down}
 		active={playerTurn === 'p1'}
+		onclick={() => onSwing && onSwing('p1')}
 	/>
 </div>
 
@@ -54,5 +56,6 @@
 		bg={currentTheme[winner ?? 'p2'].default}
 		pressed={p2down}
 		active={playerTurn === 'p2'}
+		onclick={() => onSwing && onSwing('p2')}
 	/>
 </div>

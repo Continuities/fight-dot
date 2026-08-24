@@ -66,7 +66,7 @@
 			<ScoreOverlay {score} />
 		{/if}
 		{#if showingTitle}
-			<TitleOverlay {keybinds} />
+			<TitleOverlay {keybinds} close={() => (showingTitle = false)} />
 		{/if}
 	</div>
 </div>

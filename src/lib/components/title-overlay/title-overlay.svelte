@@ -6,9 +6,10 @@
 
 	interface Props {
 		keybinds: KeyBinds;
+		close: () => void;
 	}
 
-	let { keybinds }: Props = $props();
+	let { keybinds, close }: Props = $props();
 </script>
 
 <svelte:window {onkeydown} />
@@ -21,5 +22,11 @@
 </div>
 
 <div class="absolute bottom-1/3 flex w-full justify-center">
-	<KeyButton active code={keybinds.next} fg={currentTheme.p1.light} bg={currentTheme.p1.default} />
+	<KeyButton
+		active
+		code={keybinds.next}
+		fg={currentTheme.p1.light}
+		bg={currentTheme.p1.default}
+		onclick={close}
+	/>
 </div>
