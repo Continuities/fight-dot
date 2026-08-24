@@ -58,7 +58,7 @@
 			{onTarget}
 			paused={showingTitle}
 		/>
-		<PlayerButtonsOverlay {keybinds} {playerTurn} paused={showingTitle} />
+		<PlayerButtonsOverlay {winner} {keybinds} {playerTurn} paused={showingTitle} />
 		{#if winner}
 			<WinnerOverlay {winner} {keybinds} />
 		{/if}

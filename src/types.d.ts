@@ -27,3 +27,9 @@ type KeyBinds = Record<Player, KeyCode> & {
 type Score = Record<Player, number>;
 
 type Effect = 'p1-hit' | 'p2-hit' | 'pulse';
+
+interface Shine {
+	headPosition: number; // [-1, 1]
+	tailLength: number; // [0, 1]
+	speed: number; // ms to cross screen
+}

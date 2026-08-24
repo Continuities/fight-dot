@@ -11,7 +11,10 @@
 		DOT_SIZE,
 		SHOW_FPS,
 		WIN_TIME,
-		DOT_MAX_SPEED
+		DOT_MAX_SPEED,
+		SHINE_SIZE,
+		SHINE_SPEED,
+		SHINE_DELAY
 	} from '$lib/config';
 
 	interface Props {
@@ -50,6 +53,12 @@
 	let dotSpeed = $state(STARTING_DOT_SPEED);
 	let winRange = $derived(WIN_TIME / dotSpeed);
 
+	let shines: Shine[] = [];
+
+	const getNextPosition = (pos: number, speed: number, delta: number, dir: 1 | -1 = 1) => {
+		return pos + (dir * delta * 2) / speed;
+	};
+
 	const resetGame = () => {
 		border = 0;
 		dotPos = -1;
@@ -79,11 +88,21 @@
 			if (onHit) {
 				onHit(playerTurn);
 			}
+			const newShine = {
+				headPosition: border,
+				speed: (playerTurn === 'p1' ? 1 : -1) * SHINE_SPEED,
+				tailLength: SHINE_SIZE
+			};
+			setTimeout(() => {
+				shines.push(newShine);
+			}, SHINE_DELAY);
 			border = dotPos;
 			dotSpeed = Math.max(dotSpeed - SPEEDUP_ON_HIT, DOT_MAX_SPEED);
 			if (border <= winRange - 1) {
+				border = -1;
 				triggerWin('p2');
 			} else if (border >= 1 - winRange) {
+				border = 1;
 				triggerWin('p1');
 			}
 		}
@@ -106,7 +125,7 @@
 		const ctx = canvas.getContext('2d');
 		let lastFrame = Date.now();
 		(function draw() {
-			const delta = !isActive ? 0 : Date.now() - lastFrame;
+			const delta = Date.now() - lastFrame;
 			fps = Math.round(1000 / (Date.now() - lastFrame));
 			lastFrame = Date.now();
 
@@ -114,8 +133,14 @@
 			const trackLength = canvas.width - gutterLength * 2;
 			const dir = playerTurn === 'p1' ? -1 : 1;
 			const target = border - dir * PROGRESS_WINDOW;
-			dotPos += (dir * delta * 2) / dotSpeed;
 			const wasInTarget = inTarget;
+			const barToScreenPosition = (pos: number) => {
+				return gutterLength + trackLength / 2 + pos * (trackLength / 2);
+			};
+
+			if (isActive) {
+				dotPos = getNextPosition(dotPos, dotSpeed, delta, dir);
+			}
 			inTarget =
 				dir < 0 ? dotPos <= target && dotPos > border : dotPos >= target && dotPos < border;
 			if (dotPos > 1) {
@@ -161,20 +186,75 @@
 				ctx.fill();
 
 				// Draw the ball
-				ctx.beginPath();
-				ctx.arc(
-					gutterLength + trackLength / 2 + dotPos * (trackLength / 2 - DOT_SIZE * trackLength),
-					canvas.height / 2,
-					DOT_SIZE * canvas.width * lerp(1, 3, blamAmount),
-					0,
-					Math.PI * 2
-				);
-				if (playerTurn === 'p1') {
-					ctx.fillStyle = `rgb(${currentTheme.p1.default.rgb.join(',')})`;
-				} else {
-					ctx.fillStyle = `rgb(${currentTheme.p2.default.rgb.join(',')})`;
+				if (isActive) {
+					ctx.beginPath();
+					ctx.arc(
+						barToScreenPosition(dotPos),
+						canvas.height / 2,
+						DOT_SIZE * canvas.width * lerp(1, 3, blamAmount),
+						0,
+						Math.PI * 2
+					);
+					if (playerTurn === 'p1') {
+						ctx.fillStyle = `rgb(${currentTheme.p1.default.rgb.join(',')})`;
+					} else {
+						ctx.fillStyle = `rgb(${currentTheme.p2.default.rgb.join(',')})`;
+					}
+					ctx.fill();
 				}
-				ctx.fill();
+
+				const shouldDrawShine = (shine: Shine) => {
+					if (shine.speed > 0) {
+						// moving right
+						return shine.headPosition - shine.tailLength < border;
+					}
+					// moving left
+					return shine.headPosition + shine.tailLength > border;
+				};
+
+				// Draw shiny thingsa
+				shines = shines
+					.map<Shine>((shine) => {
+						const newPos = getNextPosition(shine.headPosition, shine.speed, delta);
+						ctx.beginPath();
+						if (shine.speed > 0) {
+							// moving right
+							const tailPosition = Math.max(-1, shine.headPosition - shine.tailLength);
+							const headDistance = Math.abs(-1 - shine.headPosition);
+							const tailRemaining =
+								shine.headPosition < border ? shine.tailLength : border - tailPosition;
+							const trimmedTail = Math.min(shine.tailLength, headDistance, tailRemaining);
+							ctx.fillStyle = `rgb(${currentTheme.p1.light.rgb.join(',')})`;
+							ctx.roundRect(
+								barToScreenPosition(tailPosition),
+								canvas.height / 2 - (canvas.width * TRACK_THICKNESS) / 2,
+								(trackLength * trimmedTail) / 2,
+								canvas.width * TRACK_THICKNESS,
+								(TRACK_THICKNESS * canvas.width) / 4
+							);
+						} else {
+							// moving left
+							const tailPosition = Math.min(1, shine.headPosition + shine.tailLength);
+							const headDistance = Math.abs(1 - shine.headPosition);
+							const tailRemaining =
+								shine.headPosition > border ? shine.tailLength : tailPosition - border;
+							const trimmedTail = Math.min(shine.tailLength, headDistance, tailRemaining);
+							ctx.fillStyle = `rgb(${currentTheme.p2.light.rgb.join(',')})`;
+							ctx.roundRect(
+								barToScreenPosition(Math.max(border, shine.headPosition)),
+								canvas.height / 2 - (canvas.width * TRACK_THICKNESS) / 2,
+								(trackLength * trimmedTail) / 2,
+								canvas.width * TRACK_THICKNESS,
+								(TRACK_THICKNESS * canvas.width) / 4
+							);
+						}
+						ctx.fill();
+						return {
+							...shine,
+							headPosition: newPos
+						};
+					})
+					.filter(shouldDrawShine);
 			}
 			requestAnimationFrame(draw);
 		})();

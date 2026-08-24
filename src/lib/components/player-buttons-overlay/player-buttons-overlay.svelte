@@ -6,9 +6,10 @@
 		keybinds: KeyBinds;
 		playerTurn: Player;
 		paused?: boolean;
+		winner?: Player;
 	}
 
-	let { keybinds, playerTurn, paused }: Props = $props();
+	let { keybinds, playerTurn, paused, winner }: Props = $props();
 
 	let p1down = $state(false);
 	let p2down = $state(false);
@@ -39,8 +40,8 @@
 <div class={`${keyButton} left-4`}>
 	<KeyButton
 		code={keybinds.p1}
-		fg={currentTheme.p1.light}
-		bg={currentTheme.p1.default}
+		fg={currentTheme[winner ?? 'p1'].light}
+		bg={currentTheme[winner ?? 'p1'].default}
 		pressed={p1down}
 		active={playerTurn === 'p1'}
 	/>
@@ -49,8 +50,8 @@
 <div class={`${keyButton} right-4`}>
 	<KeyButton
 		code={keybinds.p2}
-		fg={currentTheme.p2.light}
-		bg={currentTheme.p2.default}
+		fg={currentTheme[winner ?? 'p2'].light}
+		bg={currentTheme[winner ?? 'p2'].default}
 		pressed={p2down}
 		active={playerTurn === 'p2'}
 	/>
