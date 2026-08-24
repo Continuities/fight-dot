@@ -15,7 +15,9 @@
 		DOT_MAX_SPEED,
 		SHINE_SIZE,
 		SHINE_SPEED,
-		SHINE_DELAY
+		SHINE_DELAY,
+		SEGMENT_DECAY_SPEED,
+		SEGMENT_FLOAT_DISTANCE
 	} from '$lib/config';
 
 	interface Props {
@@ -52,6 +54,9 @@
 		lerpColour(currentTheme.p2.dark, currentTheme.p1.dark, (border + 1) / 2);
 
 	let shines: Shine[] = [];
+	let segments: Segment[] = [];
+
+	const other = (player: Player) => (player === 'p1' ? 'p2' : 'p1');
 
 	const getNextPosition = (pos: number, speed: number, delta: number, dir: 1 | -1 = 1) => {
 		return pos + (dir * delta * 2) / speed;
@@ -60,7 +65,7 @@
 	const resetGame = () => {
 		border = 0;
 		dotPos = winner === 'p1' ? -1 : 1;
-		playerTurn = winner === 'p1' ? 'p2' : 'p1';
+		playerTurn = other(winner ?? 'p2');
 		winner = undefined;
 		dotSpeed = STARTING_DOT_SPEED;
 	};
@@ -86,6 +91,13 @@
 				speed: (player === 'p1' ? 1 : -1) * SHINE_SPEED,
 				tailLength: SHINE_SIZE
 			};
+			const newSegment = {
+				head: Math.min(border, dotPos),
+				length: Math.abs(border - dotPos),
+				colour: currentTheme[other(player)].default,
+				decay: 0
+			};
+			segments.push(newSegment);
 			setTimeout(() => {
 				shines.push(newShine);
 			}, SHINE_DELAY);
@@ -128,6 +140,7 @@
 			windowWidth = window.innerWidth;
 		});
 		const ctx = canvas.getContext('2d');
+
 		let lastFrame = Date.now();
 		(function draw() {
 			const delta = Date.now() - lastFrame;
@@ -217,6 +230,10 @@
 					return shine.headPosition + shine.tailLength > border;
 				};
 
+				const shouldDrawSegment = (segment: Segment) => {
+					return segment.decay < 1;
+				};
+
 				// Draw shiny thingsa
 				shines = shines
 					.map<Shine>((shine) => {
@@ -260,6 +277,30 @@
 						};
 					})
 					.filter(shouldDrawShine);
+
+				// Draw decaying segments
+				segments = segments
+					.map<Segment>((segment) => {
+						const start = barToScreenPosition(segment.head);
+						const length = trackLength * segment.length;
+						ctx.beginPath();
+						ctx.fillStyle = `rgba(${segment.colour.rgb.join(',')},${1 - segment.decay})`;
+						ctx.roundRect(
+							start,
+							canvas.height / 2 -
+								(canvas.width * TRACK_THICKNESS) / 2 -
+								segment.decay * SEGMENT_FLOAT_DISTANCE,
+							length / 2,
+							canvas.width * TRACK_THICKNESS,
+							(TRACK_THICKNESS * canvas.width) / 4
+						);
+						ctx.fill();
+						return {
+							...segment,
+							decay: Math.min(1, segment.decay + delta / SEGMENT_DECAY_SPEED)
+						};
+					})
+					.filter(shouldDrawSegment);
 			}
 			requestAnimationFrame(draw);
 		})();

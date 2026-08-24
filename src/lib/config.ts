@@ -11,6 +11,8 @@ export const EFFECT_ANIMATION_DURATION = 200; // ms
 export const SHINE_DELAY = EFFECT_ANIMATION_DURATION; //ms
 export const SHINE_SPEED = 2000; // ms
 export const SHINE_SIZE = 0.1; // [0, 1] % of track width
+export const SEGMENT_DECAY_SPEED = 300; // ms
+export const SEGMENT_FLOAT_DISTANCE = 50; // px
 export const DEFAULT_KEYBINDS: KeyBinds = {
 	p1: 'KeyQ',
 	p2: 'KeyP',

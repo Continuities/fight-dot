@@ -32,3 +32,10 @@ interface Shine {
 	tailLength: number; // [0, 1]
 	speed: number; // ms to cross screen
 }
+
+interface Segment {
+	colour: Colour;
+	head: number; // [-1, 1]
+	length: number; // [0, 1]
+	decay: number; // [0, 1]
+}
