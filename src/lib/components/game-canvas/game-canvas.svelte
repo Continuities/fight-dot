@@ -55,6 +55,7 @@
 		dotPos = -1;
 		playerTurn = 'p1';
 		winner = undefined;
+		dotSpeed = STARTING_DOT_SPEED;
 	};
 
 	const triggerWin = (forPlayer: Player) => {
