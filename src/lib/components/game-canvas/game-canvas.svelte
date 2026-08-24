@@ -134,7 +134,7 @@
 			fps = Math.round(1000 / (Date.now() - lastFrame));
 			lastFrame = Date.now();
 
-			const gutterLength = GUTTER_SIZE * canvas.width;
+			const gutterLength = GUTTER_SIZE;
 			const trackLength = canvas.width - gutterLength * 2;
 			const dir = playerTurn === 'p1' ? -1 : 1;
 			const target = border - dir * PROGRESS_WINDOW;

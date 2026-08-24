@@ -11,6 +11,7 @@
 	}
 	let { action, fg, bg, active }: Props = $props();
 	const code = $derived(DEFAULT_KEYBINDS[action]);
+	const label = $derived(code.startsWith('Key') ? code.substring(3) : code);
 	const pressed = $derived(Input[action].current);
 
 	const onpointerdown = () => {
@@ -31,5 +32,5 @@
 	style={`--dark:rgb(${bg.rgb.join(',')});--light:rgb(${(pressed ? bg : fg).rgb.join(',')})`}
 	class={`w-25 rounded border-b-4 border-(--dark) bg-(--light) px-4 py-2 text-sm font-medium tracking-wider text-(--fg) ${
 		!active ? 'opacity-50' : ''
-	} left-4`}>{code}</button
+	} left-4`}>{label}</button
 >

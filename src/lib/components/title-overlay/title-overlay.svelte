@@ -20,11 +20,11 @@
 
 <div
 	transition:fade={{ duration: 100 }}
-	class="absolute top-0 flex h-full w-full items-center justify-center text-8xl font-thin tracking-widest text-(--fg) backdrop-blur-2xl"
+	class="absolute top-0 flex h-full w-full items-center justify-center text-xl font-thin tracking-widest text-(--fg) backdrop-blur-2xl md:text-6xl xl:text-8xl"
 >
 	{m.title()}
 </div>
 
-<div class="absolute bottom-1/3 flex w-full justify-center">
+<div class="absolute top-1/2 flex w-full justify-center pt-22">
 	<KeyButton active action="next" fg={currentTheme.p1.light} bg={currentTheme.p1.default} />
 </div>

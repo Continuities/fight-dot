@@ -12,13 +12,13 @@
 
 <div
 	transition:fade={{ duration: 100 }}
-	class="absolute top-0 left-0 flex h-full w-full flex-col items-center justify-center text-9xl leading-none font-thin tracking-widest text-(--winner) backdrop-blur"
+	class="absolute top-0 left-0 flex h-full w-full flex-col items-center justify-center text-6xl leading-none font-thin tracking-widest text-(--winner) backdrop-blur md:text-8xl"
 	style={`--winner:var(--${winner})`}
 >
 	{m.winner({ name: winner.toUpperCase() })}
 </div>
 
-<div class="absolute bottom-1/4 flex w-full justify-center">
+<div class="absolute top-1/2 flex w-full justify-center pt-22">
 	<KeyButton
 		action="next"
 		active

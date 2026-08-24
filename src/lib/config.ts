@@ -1,7 +1,7 @@
 export const SHOW_FPS = false;
 export const DOT_SIZE = 0.006; // [0, 1] % of screen width
 export const TRACK_THICKNESS = 0.003; // [0, 1] % of screen width
-export const GUTTER_SIZE = 0.08; // [0, 1] % of screen width
+export const GUTTER_SIZE = 130; // px
 export const STARTING_DOT_SPEED = 3000; // ms to cross the screen
 export const DOT_MAX_SPEED = 1500; // ms to cross the screen
 export const SPEEDUP_ON_HIT = 50; // ms of speed gained per hit
