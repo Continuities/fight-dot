@@ -21,12 +21,12 @@ export const DEFAULT_THEME: Theme = {
 	fg: { rgb: [233, 216, 166] },
 	p1: {
 		default: { rgb: [0, 95, 115] },
-		light: { rgb: [10, 147, 150] },
+		light: { rgb: [51, 127, 143] },
 		dark: { rgb: [0, 10, 12] }
 	},
 	p2: {
 		default: { rgb: [174, 32, 18] },
-		light: { rgb: [186, 62, 3] },
+		light: { rgb: [190, 77, 65] },
 		dark: { rgb: [17, 3, 2] }
 	}
 };
