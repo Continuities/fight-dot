@@ -20,10 +20,9 @@ interface Theme {
 type Player = 'p1' | 'p2';
 
 type KeyCode = string;
+type InputAction = Player | 'next';
 
-type KeyBinds = Record<Player, KeyCode> & {
-	next: KeyCode;
-};
+type KeyBinds = Record<InputAction, KeyCode>;
 type Score = Record<Player, number>;
 
 type Effect = 'p1-hit' | 'p2-hit' | 'pulse';

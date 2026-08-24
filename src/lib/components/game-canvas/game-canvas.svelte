@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import { currentTheme } from '$lib/theme.svelte';
 	import { lerp, lerpColour } from '$lib/lerp';
+	import Input from '$lib/input.svelte';
 	import {
 		GUTTER_SIZE,
 		PROGRESS_WINDOW,
@@ -20,7 +21,6 @@
 	interface Props {
 		winner: Player | undefined;
 		playerTurn: Player;
-		keybinds: KeyBinds;
 		paused?: boolean;
 		onGameWon?: (winner: Player) => void;
 		onHit?: (hitter: Player) => void;
@@ -30,28 +30,26 @@
 	let {
 		winner = $bindable(),
 		playerTurn = $bindable('p1'),
-		keybinds,
 		paused,
 		onGameWon,
 		onHit,
 		onTarget
 	}: Props = $props();
 
-	let canvas: HTMLCanvasElement;
-	let fps = $state(0);
 	let windowHeight = $state(0);
 	let windowWidth = $state(0);
-	let border = $state(0); // [-1, 1]
-	let dotPos = $state(1); // [-1, 1]
-	let inTarget = $state(false); // is the ball in the target window
-
 	let isActive = $derived(!winner && !paused);
-	let background = $derived(
-		lerpColour(currentTheme.p2.dark, currentTheme.p1.dark, (border + 1) / 2)
-	);
+	let fps = $state(0);
 
-	let dotSpeed = $state(STARTING_DOT_SPEED);
-	let winRange = $derived(WIN_TIME / dotSpeed);
+	let canvas: HTMLCanvasElement;
+	let border = 0; // [-1, 1]
+	let dotPos = 1; // [-1, 1]
+	let inTarget = false; // is the ball in the target window
+
+	let dotSpeed = STARTING_DOT_SPEED;
+	const getWinRange = () => WIN_TIME / dotSpeed;
+	const getBackground = () =>
+		lerpColour(currentTheme.p2.dark, currentTheme.p1.dark, (border + 1) / 2);
 
 	let shines: Shine[] = [];
 
@@ -61,8 +59,8 @@
 
 	const resetGame = () => {
 		border = 0;
-		dotPos = -1;
-		playerTurn = 'p1';
+		dotPos = winner === 'p1' ? -1 : 1;
+		playerTurn = winner === 'p1' ? 'p2' : 'p1';
 		winner = undefined;
 		dotSpeed = STARTING_DOT_SPEED;
 	};
@@ -74,23 +72,18 @@
 		}
 	};
 
-	const onkeydown = (e: KeyboardEvent) => {
-		if (winner) {
-			if (e.code === keybinds.next) {
-				resetGame();
-			}
-			return;
-		}
-		if (!isActive || e.code !== keybinds[playerTurn]) {
+	const doSwing = (player: Player) => {
+		const isTurn = untrack(() => playerTurn === player);
+		if (!isActive || !isTurn) {
 			return;
 		}
 		if (inTarget) {
 			if (onHit) {
-				onHit(playerTurn);
+				onHit(player);
 			}
 			const newShine = {
 				headPosition: border,
-				speed: (playerTurn === 'p1' ? 1 : -1) * SHINE_SPEED,
+				speed: (player === 'p1' ? 1 : -1) * SHINE_SPEED,
 				tailLength: SHINE_SIZE
 			};
 			setTimeout(() => {
@@ -98,22 +91,34 @@
 			}, SHINE_DELAY);
 			border = dotPos;
 			dotSpeed = Math.max(dotSpeed - SPEEDUP_ON_HIT, DOT_MAX_SPEED);
-			if (border <= winRange - 1) {
+			if (border <= getWinRange() - 1) {
 				border = -1;
 				triggerWin('p2');
-			} else if (border >= 1 - winRange) {
+			} else if (border >= 1 - getWinRange()) {
 				border = 1;
 				triggerWin('p1');
 			}
 		}
-		dotPos = playerTurn === 'p1' ? -1 : 1;
+		dotPos = player === 'p1' ? -1 : 1;
 	};
 
-	const onclick = () => {
-		if (winner) {
+	$effect(() => {
+		if (Input.p1.current) {
+			doSwing('p1');
+		}
+	});
+
+	$effect(() => {
+		if (Input.p2.current) {
+			doSwing('p2');
+		}
+	});
+
+	$effect(() => {
+		if (Input.next.current && winner) {
 			resetGame();
 		}
-	};
+	});
 
 	onMount(() => {
 		windowHeight = window.innerHeight;
@@ -156,7 +161,7 @@
 
 			if (ctx) {
 				const blamAmount = !inTarget ? 0 : Math.abs(dotPos - border) / PROGRESS_WINDOW;
-				ctx.fillStyle = `rgb(${background.rgb.join(',')})`;
+				ctx.fillStyle = `rgb(${getBackground().rgb.join(',')})`;
 				ctx.fillRect(0, 0, canvas.width, canvas.height);
 				ctx.fillStyle = `rgb(${currentTheme.fg.rgb.join(',')})`;
 				ctx.lineWidth = TRACK_THICKNESS * canvas.width;
@@ -261,17 +266,12 @@
 	});
 </script>
 
-<svelte:window bind:innerHeight={windowHeight} bind:innerWidth={windowWidth} {onkeydown} />
+<svelte:window bind:innerHeight={windowHeight} bind:innerWidth={windowWidth} />
 
 {#if SHOW_FPS}
 	<div class="absolute top-0 left-0 m-2 text-white">
 		FPS: {fps}
 	</div>
 {/if}
-<canvas
-	{onclick}
-	class="h-screen w-screen"
-	bind:this={canvas}
-	height={windowHeight}
-	width={windowWidth}
+<canvas class="h-screen w-screen" bind:this={canvas} height={windowHeight} width={windowWidth}
 ></canvas>

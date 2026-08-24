@@ -12,8 +12,8 @@ export const SHINE_DELAY = EFFECT_ANIMATION_DURATION; //ms
 export const SHINE_SPEED = 2000; // ms
 export const SHINE_SIZE = 0.1; // [0, 1] % of track width
 export const DEFAULT_KEYBINDS: KeyBinds = {
-	p1: 'ShiftLeft',
-	p2: 'ShiftRight',
+	p1: 'KeyQ',
+	p2: 'KeyP',
 	next: 'Space'
 };
 export const DEFAULT_THEME: Theme = {

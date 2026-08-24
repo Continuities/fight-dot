@@ -4,9 +4,7 @@
 	import ScoreOverlay from '$lib/components/score-overlay/score-overlay.svelte';
 	import TitleOverlay from '$lib/components/title-overlay/title-overlay.svelte';
 	import WinnerOverlay from '$lib/components/winner-overlay/winner-overlay.svelte';
-	import { EFFECT_ANIMATION_DURATION, DEFAULT_KEYBINDS } from '$lib/config';
-
-	const keybinds = DEFAULT_KEYBINDS;
+	import { EFFECT_ANIMATION_DURATION } from '$lib/config';
 
 	let showingTitle = $state(true);
 	let winner: Player | undefined = $state();
@@ -37,36 +35,20 @@
 	const onTarget = () => {
 		triggerEffect('pulse');
 	};
-
-	const onkeydown = (e: KeyboardEvent) => {
-		if (showingTitle && e.code === keybinds.next) {
-			showingTitle = false;
-		}
-	};
 </script>
-
-<svelte:window {onkeydown} />
 
 <div class="overflow-hidden bg-(--bg)">
 	<div class={currentEffect} style={`--duration:${EFFECT_ANIMATION_DURATION}ms`}>
-		<GameCanvas
-			bind:playerTurn
-			bind:winner
-			{keybinds}
-			{onGameWon}
-			{onHit}
-			{onTarget}
-			paused={showingTitle}
-		/>
-		<PlayerButtonsOverlay {winner} {keybinds} {playerTurn} paused={showingTitle} />
+		<GameCanvas bind:playerTurn bind:winner {onGameWon} {onHit} {onTarget} paused={showingTitle} />
+		<PlayerButtonsOverlay {winner} {playerTurn} />
 		{#if winner}
-			<WinnerOverlay {winner} {keybinds} />
+			<WinnerOverlay {winner} />
 		{/if}
 		{#if score.p1 > 0 || score.p2 > 0}
 			<ScoreOverlay {score} />
 		{/if}
 		{#if showingTitle}
-			<TitleOverlay {keybinds} close={() => (showingTitle = false)} />
+			<TitleOverlay close={() => (showingTitle = false)} />
 		{/if}
 	</div>
 </div>

@@ -3,16 +3,20 @@
 	import { currentTheme } from '$lib/theme.svelte';
 	import { fade } from 'svelte/transition';
 	import KeyButton from '../key-button/key-button.svelte';
+	import Input from '$lib/input.svelte';
 
 	interface Props {
-		keybinds: KeyBinds;
 		close: () => void;
 	}
 
-	let { keybinds, close }: Props = $props();
-</script>
+	let { close }: Props = $props();
 
-<svelte:window {onkeydown} />
+	$effect(() => {
+		if (Input.next.current) {
+			close();
+		}
+	});
+</script>
 
 <div
 	transition:fade={{ duration: 100 }}
@@ -22,11 +26,5 @@
 </div>
 
 <div class="absolute bottom-1/3 flex w-full justify-center">
-	<KeyButton
-		active
-		code={keybinds.next}
-		fg={currentTheme.p1.light}
-		bg={currentTheme.p1.default}
-		onclick={close}
-	/>
+	<KeyButton active action="next" fg={currentTheme.p1.light} bg={currentTheme.p1.default} />
 </div>
