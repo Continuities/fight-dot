@@ -1,5 +1,6 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
 	"title": "POMME DE DISCORDE",
-	"winner": "{name} GAGNE"
+	"winner": "{name} GAGNE",
+	"draw": "NUL"
 }

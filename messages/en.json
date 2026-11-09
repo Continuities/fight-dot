@@ -1,5 +1,6 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
 	"title": "POINT OF CONTENTION",
-	"winner": "{name} WINS"
+	"winner": "{name} WINS",
+	"draw": "DRAW"
 }

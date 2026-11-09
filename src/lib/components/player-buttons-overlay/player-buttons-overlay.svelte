@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { currentTheme } from '$lib/theme.svelte';
 	import KeyButton from '../key-button/key-button.svelte';
 
 	interface Props {
@@ -12,19 +11,9 @@
 </script>
 
 <div class={`${keyButton} left-4`}>
-	<KeyButton
-		action="p1"
-		fg={currentTheme[winner ?? 'p1'].light}
-		bg={currentTheme[winner ?? 'p1'].default}
-		active={playerTurn === 'p1'}
-	/>
+	<KeyButton action="p1" colour={winner ?? 'p1'} active={playerTurn === 'p1'} />
 </div>
 
 <div class={`${keyButton} right-4`}>
-	<KeyButton
-		action="p2"
-		fg={currentTheme[winner ?? 'p2'].light}
-		bg={currentTheme[winner ?? 'p2'].default}
-		active={playerTurn === 'p2'}
-	/>
+	<KeyButton action="p2" colour={winner ?? 'p2'} active={playerTurn === 'p2'} />
 </div>

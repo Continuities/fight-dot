@@ -8,15 +8,9 @@ type ThemeEntries = {
 
 export function themeToVars(theme: Theme): string {
 	return (Object.entries(theme) as ThemeEntries[])
-		.map(([k, v]) => {
-			switch (k) {
-				case 'bg':
-				case 'fg':
-					return `--${k}:rgb(${v.rgb.join(',')});`;
-				case 'p1':
-				case 'p2':
-					return `--${k}:rgb(${v.default.rgb.join(',')});--${k}-light:rgb(${v.light.rgb.join(',')});--${k}-dark:rgb(${v.dark.rgb.join(',')});`;
-			}
-		})
+		.map(
+			([k, v]) =>
+				`--${k}:rgb(${v.default.rgb.join(',')});--${k}-light:rgb(${v.light.rgb.join(',')});--${k}-dark:rgb(${v.dark.rgb.join(',')});`
+		)
 		.join('');
 }

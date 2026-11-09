@@ -13,14 +13,26 @@ export const SHINE_SPEED = 2000; // ms
 export const SHINE_SIZE = 0.1; // [0, 1] % of track width
 export const SEGMENT_DECAY_SPEED = 300; // ms
 export const SEGMENT_FLOAT_DISTANCE = 50; // px
+export const GAME_DURATION_SECONDS = 15; // 0 for infinite
+export const GAME_DURATION_COUNTDOWN = 10; // display the last X seconds
+
 export const DEFAULT_KEYBINDS: KeyBinds = {
 	p1: 'KeyQ',
 	p2: 'KeyP',
 	next: 'Space'
 };
+
 export const DEFAULT_THEME: Theme = {
-	bg: { rgb: [17, 17, 17] },
-	fg: { rgb: [233, 216, 166] },
+	bg: {
+		default: { rgb: [17, 17, 17] },
+		light: { rgb: [17, 17, 17] },
+		dark: { rgb: [17, 17, 17] }
+	},
+	fg: {
+		default: { rgb: [233, 216, 166] },
+		light: { rgb: [233, 216, 166] },
+		dark: { rgb: [233, 216, 166] }
+	},
 	p1: {
 		default: { rgb: [0, 95, 115] },
 		light: { rgb: [51, 127, 143] },

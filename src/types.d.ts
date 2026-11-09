@@ -2,22 +2,22 @@ interface Colour {
 	rgb: [number, number, number];
 }
 
-interface Theme {
-	bg: Colour;
-	fg: Colour;
-	p1: {
-		default: Colour;
-		light: Colour;
-		dark: Colour;
-	};
-	p2: {
-		default: Colour;
-		light: Colour;
-		dark: Colour;
-	};
+interface ColourFamily {
+	default: Colour;
+	light: Colour;
+	dark: Colour;
 }
 
+interface Theme {
+	bg: ColourFamily;
+	fg: ColourFamily;
+	p1: ColourFamily;
+	p2: ColourFamily;
+}
+type ThemeColour = keyof Theme;
+
 type Player = 'p1' | 'p2';
+type WinState = Player | 'draw';
 
 type KeyCode = string;
 type InputAction = Player | 'next';

@@ -1,22 +1,33 @@
 <script lang="ts">
 	import { GameCanvas } from '$lib/components/game-canvas';
+	import GameTimerOverlay from '$lib/components/game-timer-overlay/game-timer-overlay.svelte';
 	import { PlayerButtonsOverlay } from '$lib/components/player-buttons-overlay';
 	import ScoreOverlay from '$lib/components/score-overlay/score-overlay.svelte';
 	import TitleOverlay from '$lib/components/title-overlay/title-overlay.svelte';
 	import WinnerOverlay from '$lib/components/winner-overlay/winner-overlay.svelte';
-	import { EFFECT_ANIMATION_DURATION } from '$lib/config';
+	import {
+		EFFECT_ANIMATION_DURATION,
+		GAME_DURATION_COUNTDOWN,
+		GAME_DURATION_SECONDS
+	} from '$lib/config';
+
+	const hasTimer = GAME_DURATION_SECONDS > 0;
 
 	let showingTitle = $state(true);
-	let winner: Player | undefined = $state();
+	let winner: WinState | undefined = $state();
 	let playerTurn: Player = $state('p1');
 	let score: Score = $state({
 		p1: 0,
 		p2: 0
 	});
 	let currentEffect: Effect | undefined = $state();
+	let millisRemaining = $state(GAME_DURATION_SECONDS * 1000);
+	let showTimer = $derived(hasTimer && millisRemaining <= GAME_DURATION_COUNTDOWN * 1000);
 
-	const onGameWon = (player: Player) => {
-		score[player]++;
+	const onGameOver = (winner: WinState) => {
+		if (winner !== 'draw') {
+			score[winner]++;
+		}
 	};
 
 	let effectTimeout: NodeJS.Timeout;
@@ -39,8 +50,19 @@
 
 <div class="overflow-hidden bg-(--bg)">
 	<div class={currentEffect} style={`--duration:${EFFECT_ANIMATION_DURATION}ms`}>
-		<GameCanvas bind:playerTurn bind:winner {onGameWon} {onHit} {onTarget} paused={showingTitle} />
-		<PlayerButtonsOverlay {winner} {playerTurn} />
+		<GameCanvas
+			bind:playerTurn
+			bind:winner
+			bind:millisRemaining
+			{onGameOver}
+			{onHit}
+			{onTarget}
+			paused={showingTitle}
+		/>
+		<PlayerButtonsOverlay winner={winner && winner !== 'draw' ? winner : undefined} {playerTurn} />
+		{#if showTimer}
+			<GameTimerOverlay secondsRemaining={Math.ceil(millisRemaining / 1000)} />
+		{/if}
 		{#if winner}
 			<WinnerOverlay {winner} />
 		{/if}

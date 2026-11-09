@@ -17,14 +17,16 @@
 		SHINE_SPEED,
 		SHINE_DELAY,
 		SEGMENT_DECAY_SPEED,
-		SEGMENT_FLOAT_DISTANCE
+		SEGMENT_FLOAT_DISTANCE,
+		GAME_DURATION_SECONDS
 	} from '$lib/config';
 
 	interface Props {
-		winner: Player | undefined;
+		winner: WinState | undefined;
 		playerTurn: Player;
+		millisRemaining: number;
 		paused?: boolean;
-		onGameWon?: (winner: Player) => void;
+		onGameOver?: (winner: WinState) => void;
 		onHit?: (hitter: Player) => void;
 		onTarget?: () => void;
 	}
@@ -32,8 +34,9 @@
 	let {
 		winner = $bindable(),
 		playerTurn = $bindable('p1'),
+		millisRemaining = $bindable(GAME_DURATION_SECONDS * 1000),
 		paused,
-		onGameWon,
+		onGameOver,
 		onHit,
 		onTarget
 	}: Props = $props();
@@ -63,17 +66,21 @@
 	};
 
 	const resetGame = () => {
+		millisRemaining = GAME_DURATION_SECONDS * 1000;
 		border = 0;
 		dotPos = winner === 'p1' ? -1 : 1;
-		playerTurn = other(winner ?? 'p2');
+		playerTurn = !winner || winner === 'draw' ? 'p1' : other(winner);
 		winner = undefined;
 		dotSpeed = STARTING_DOT_SPEED;
 	};
 
-	const triggerWin = (forPlayer: Player) => {
+	const triggerWin = (forPlayer: WinState) => {
+		if (forPlayer !== 'draw') {
+			border = forPlayer === 'p1' ? 1 : -1;
+		}
 		winner = forPlayer;
-		if (onGameWon) {
-			onGameWon(forPlayer);
+		if (onGameOver) {
+			onGameOver(forPlayer);
 		}
 	};
 
@@ -104,10 +111,8 @@
 			border = dotPos;
 			dotSpeed = Math.max(dotSpeed - SPEEDUP_ON_HIT, DOT_MAX_SPEED);
 			if (border <= getWinRange() - 1) {
-				border = -1;
 				triggerWin('p2');
 			} else if (border >= 1 - getWinRange()) {
-				border = 1;
 				triggerWin('p1');
 			}
 		}
@@ -158,6 +163,10 @@
 
 			if (isActive) {
 				dotPos = getNextPosition(dotPos, dotSpeed, delta, dir);
+				millisRemaining -= delta;
+				if (millisRemaining <= 0) {
+					triggerWin(border === 0 ? 'draw' : border < 0 ? 'p2' : 'p1');
+				}
 			}
 			inTarget =
 				dir < 0 ? dotPos <= target && dotPos > border : dotPos >= target && dotPos < border;
@@ -176,7 +185,7 @@
 				const blamAmount = !inTarget ? 0 : Math.abs(dotPos - border) / PROGRESS_WINDOW;
 				ctx.fillStyle = `rgb(${getBackground().rgb.join(',')})`;
 				ctx.fillRect(0, 0, canvas.width, canvas.height);
-				ctx.fillStyle = `rgb(${currentTheme.fg.rgb.join(',')})`;
+				ctx.fillStyle = `rgb(${currentTheme.fg.default.rgb.join(',')})`;
 				ctx.lineWidth = TRACK_THICKNESS * canvas.width;
 
 				// Draw p1 territory
