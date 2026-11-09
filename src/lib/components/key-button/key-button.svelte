@@ -13,7 +13,7 @@
 	const code = $derived(DEFAULT_KEYBINDS[action]);
 	const label = $derived(code.startsWith('Key') ? code.substring(3) : code);
 	const pressed = $derived(Input[action].current);
-	const bg = $derived(currentTheme[colour].dark);
+	const bg = $derived(currentTheme[colour].default);
 	const fg = $derived(currentTheme[colour].light);
 	const text = $derived(currentTheme[colour === 'fg' ? 'bg' : 'fg'].default);
 
