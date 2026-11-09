@@ -13,7 +13,7 @@ export const SHINE_SPEED = 2000; // ms
 export const SHINE_SIZE = 0.1; // [0, 1] % of track width
 export const SEGMENT_DECAY_SPEED = 300; // ms
 export const SEGMENT_FLOAT_DISTANCE = 50; // px
-export const GAME_DURATION_SECONDS = 15; // 0 for infinite
+export const GAME_DURATION_SECONDS = 30; // 0 for infinite
 export const GAME_DURATION_COUNTDOWN = 10; // display the last X seconds
 
 export const DEFAULT_KEYBINDS: KeyBinds = {

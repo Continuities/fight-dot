@@ -18,7 +18,8 @@
 		SHINE_DELAY,
 		SEGMENT_DECAY_SPEED,
 		SEGMENT_FLOAT_DISTANCE,
-		GAME_DURATION_SECONDS
+		GAME_DURATION_SECONDS,
+		GAME_DURATION_COUNTDOWN
 	} from '$lib/config';
 
 	interface Props {
@@ -40,6 +41,12 @@
 		onHit,
 		onTarget
 	}: Props = $props();
+
+	const hasTimer = GAME_DURATION_SECONDS > 0;
+	let secondsRemaining = $derived(Math.ceil(millisRemaining / 1000));
+	let showTimer = $derived(
+		hasTimer && secondsRemaining <= GAME_DURATION_COUNTDOWN && secondsRemaining > 0
+	);
 
 	let windowHeight = $state(0);
 	let windowWidth = $state(0);
@@ -146,6 +153,9 @@
 		});
 		const ctx = canvas.getContext('2d');
 
+		const font = getComputedStyle(document.documentElement).getPropertyValue('--font-sans').trim();
+		console.log(font);
+
 		let lastFrame = Date.now();
 		(function draw() {
 			const delta = Date.now() - lastFrame;
@@ -185,8 +195,22 @@
 				const blamAmount = !inTarget ? 0 : Math.abs(dotPos - border) / PROGRESS_WINDOW;
 				ctx.fillStyle = `rgb(${getBackground().rgb.join(',')})`;
 				ctx.fillRect(0, 0, canvas.width, canvas.height);
-				ctx.fillStyle = `rgb(${currentTheme.fg.default.rgb.join(',')})`;
 				ctx.lineWidth = TRACK_THICKNESS * canvas.width;
+
+				// Draw countdown timer
+				if (showTimer) {
+					const fraction = secondsRemaining - millisRemaining / 1000;
+					const opacity = (1 - fraction) / 4;
+					const baseSize = Math.min(canvas.height, canvas.width / 2);
+					const fontSize = baseSize / 2 + baseSize * (fraction / 2);
+					ctx.font = `${fontSize}px ${font}`;
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'middle';
+					ctx.fillStyle = `rgba(${currentTheme.fg.default.rgb.join(',')},${opacity})`;
+					ctx.fillText(String(secondsRemaining), canvas.width / 2, canvas.height / 2);
+				}
+
+				ctx.fillStyle = `rgb(${currentTheme.fg.default.rgb.join(',')})`;
 
 				// Draw p1 territory
 				ctx.fillStyle = `rgb(${currentTheme.p1.default.rgb.join(',')})`;
